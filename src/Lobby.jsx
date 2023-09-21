@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useState } from "react";
 import { useSocket } from "./SocketProvider";
 import { useNavigate } from "react-router-dom";
 import logo from "./zoom-meeting-logo-transparent-png-21.png";
+import { toast, Toaster } from "react-hot-toast";
 
 const Lobby = () => {
   const [room, setRoom] = useState("");
@@ -26,16 +27,22 @@ const Lobby = () => {
     [navigate]
   );
 
+  const handeleLimit = () => {
+    toast.error("2 Person are already connected Please join another room");
+  };
+
   useEffect(() => {
+    socket.on("user:limit", handeleLimit);
     socket.on("room:join", handleJoinRoom);
     return () => {
-      console.log("of");
       socket.off("room:join", handleJoinRoom);
+      socket.off("user:limit", handeleLimit);
     };
   }, [socket, handleJoinRoom]);
 
   return (
-    <section className="bg-gray-100 dark:bg-gray-900">
+    <section className="bg-gray-300 dark:bg-gray-900">
+      <Toaster position="top-center" reverseOrder={false}></Toaster>
       <div className="flex flex-col items-center justify-center px-6 py-8 mx-auto md:h-screen lg:py-0">
         <a
           href="/"
